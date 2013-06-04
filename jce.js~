@@ -1,0 +1,6 @@
+var engine = {
+
+    getPossibleMoves: function() {
+	 alert(chessBoard.turn);
+    }
+}
