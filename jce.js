@@ -40,5 +40,29 @@ var engine = {
 	     }
 	 }
 
-    }
+	 return moves;
+
+    },
+
+
+
+    getHeuristic: function(position) {
+	 
+	 var score = 0;
+	 var result = chessBoard.getResult();
+	 
+	 if (result === "white")
+	     return 1000;
+	 else if (result === "black")
+	     return -1000;
+	 else if (result === "draw")
+	     return 0;
+
+	 var pieceValue = {"K":0, "Q":8.5, "R": 4.5, "B":3, "N":2.5, "P":1, "k":0, "q":-8.5, "r": -4.5, "b":-3, "n":-2.5, "p":-1 };  
+
+	 for (var k in position) 
+	     score += pieceValue[position[k]];
+
+	 return score;
+   },
 }
