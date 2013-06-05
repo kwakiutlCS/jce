@@ -1,16 +1,19 @@
 var engine = {
 
+    depth: 1,
+
+
     // gets all the possible moves in the board in a [["e2","e4"],["d2","d4"], ... ] format
-    getPossibleMoves: function() {
+    getPossibleMoves: function(position, turn) {
 	 var moves = [];
 
 	 
-	 if (chessBoard.turn === "white") {
-	     for (var k in chessBoard.position) {
+	 if (turn === "white") {
+	     for (var k in position) {
 		  
-		  if (chessBoard.position[k] === chessBoard.position[k].toUpperCase()) {
+		  if (position[k] === position[k].toUpperCase()) {
 		      var partialMoves = [];
-		      var possibleMoves = chessBoard.filterIllegalMoves(k, chessBoard.getPossibleMoves(k,chessBoard.position), "black");
+		      var possibleMoves = chessBoard.filterIllegalMoves(k, chessBoard.getPossibleMoves(k,position), "black");
 
 		      for (var m in possibleMoves) {
 			   partialMoves.push([k,possibleMoves[m]]);
@@ -22,12 +25,12 @@ var engine = {
 		  }
 	     }
 	 }
-	 else if (chessBoard.turn === "black") {
-	     for (var k in chessBoard.position) {
+	 else if (turn === "black") {
+	     for (var k in position) {
 		  
-		  if (chessBoard.position[k] === chessBoard.position[k].toLowerCase()) {
+		  if (position[k] === position[k].toLowerCase()) {
 		      var partialMoves = [];
-		      var possibleMoves = chessBoard.filterIllegalMoves(k,chessBoard.getPossibleMoves(k,chessBoard.position), "white");
+		      var possibleMoves = chessBoard.filterIllegalMoves(k,chessBoard.getPossibleMoves(k,position), "white");
 
 		      for (var m in possibleMoves) {
 			   partialMoves.push([k,possibleMoves[m]]);
@@ -65,4 +68,18 @@ var engine = {
 
 	 return score;
    },
+
+    
+    getEvaluation: function(pos, depth, color, turn) {
+	 
+	 
+	 if (depth === 1) {
+	     var possibleMoves = this.getPossibleMoves(pos, turn);
+	 }
+	 else {
+
+	 }
+
+	 
+    },
 }
