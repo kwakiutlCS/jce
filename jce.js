@@ -49,10 +49,10 @@ var engine = {
 
 
 
-    getHeuristic: function(position) {
+    getHeuristic: function(position,turn) {
 	 
 	 var score = 0;
-	 var result = chessBoard.getResult();
+	 var result = chessBoard.getResult(position,turn);
 	 
 	 if (result === "white")
 	     return 1000;
@@ -66,18 +66,73 @@ var engine = {
 	 for (var k in position) 
 	     score += pieceValue[position[k]];
 
+	 
 	 return score;
    },
 
     
     getEvaluation: function(pos, depth, color, turn) {
 	 
+	 var other = "black";
+	 if (turn === "black")
+	     other = "white";
 	 
 	 if (depth === 1) {
 	     var possibleMoves = this.getPossibleMoves(pos, turn);
-	 }
-	 else {
+	    
+	     var score = 0;
 
+	     for (var move in possibleMoves) {
+		  score += this.getHeuristic(chessBoard.generateNewPosition(possibleMoves[move][0],possibleMoves[move][1],"-",pos), turn);
+		  
+	     }
+	     score /= possibleMoves.length;
+	     
+	     return [score,""];
+	 }
+
+	 else {
+	     
+	     var result = chessBoard.getResult(pos, turn);
+	     if (result === "white")
+		  return [1000,""];
+	     else if (result === "black")
+		  return [-1000,""];
+	     else if (result === "draw")
+		  return [0,""];
+	     
+	     
+	     if (color === turn) {
+		  
+		  var possibleMoves = this.getPossibleMoves(pos, turn);
+		  var bestMove = false;
+		  
+		  for (var m in possibleMoves) {
+		      
+		      var score = this.getEvaluation(chessBoard.generateNewPosition(possibleMoves[m][0],possibleMoves[m][1],"-",pos), depth-1,color,other);
+		      
+		      if (!bestMove || (turn === "white" && score[0] > bestMove[0]) || (turn === "black" && score[0] < bestMove[0]))
+			   bestMove = [score[0], possibleMoves[m]];
+		      
+		  }
+
+		  return bestMove;
+	     }
+	     
+	     else {
+		  
+		  var possibleMoves = this.getPossibleMoves(pos, turn);
+		  var score = 0;
+		  
+		  for (var m in possibleMoves) {
+		      
+		      score += this.getEvaluation(chessBoard.generateNewPosition(possibleMoves[m][0],possibleMoves[m][1],"-",pos), depth-1,color,other)[0];
+		      		      
+		  }
+
+		  return [score/possibleMoves.length,""];
+	     }
+	     
 	 }
 
 	 
