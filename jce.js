@@ -6,14 +6,14 @@ var engine = {
     // gets all the possible moves in the board in a [["e2","e4"],["d2","d4"], ... ] format
     getPossibleMoves: function(position, turn) {
 	 var moves = [];
-
 	 
 	 if (turn === "white") {
 	     for (var k in position) {
 		  
 		  if (position[k] === position[k].toUpperCase()) {
 		      var partialMoves = [];
-		      var possibleMoves = chessBoard.filterIllegalMoves(k, chessBoard.getPossibleMoves(k,position), "black");
+		      
+		      var possibleMoves = chessBoard.filterIllegalMoves(k, chessBoard.getPossibleMoves(k,position), "black", position, "-");
 
 		      for (var m in possibleMoves) {
 			   partialMoves.push([k,possibleMoves[m]]);
@@ -30,7 +30,8 @@ var engine = {
 		  
 		  if (position[k] === position[k].toLowerCase()) {
 		      var partialMoves = [];
-		      var possibleMoves = chessBoard.filterIllegalMoves(k,chessBoard.getPossibleMoves(k,position), "white");
+		      
+		      var possibleMoves = chessBoard.filterIllegalMoves(k,chessBoard.getPossibleMoves(k,position), "white", position, "-");
 
 		      for (var m in possibleMoves) {
 			   partialMoves.push([k,possibleMoves[m]]);
@@ -52,7 +53,7 @@ var engine = {
     getHeuristic: function(position,turn) {
 	 
 	 var score = 0;
-	 var result = chessBoard.getResult(position,turn);
+	 var result = chessBoard.getResult(position,turn,"-");
 	 
 	 if (result === "white")
 	     return 1000;
@@ -72,7 +73,7 @@ var engine = {
 
     
     getEvaluation: function(pos, depth, color, turn) {
-	 
+	 console.log(depth);
 	 var other = "black";
 	 if (turn === "black")
 	     other = "white";
@@ -93,7 +94,7 @@ var engine = {
 
 	 else {
 	     
-	     var result = chessBoard.getResult(pos, turn);
+	     var result = chessBoard.getResult(pos, turn, "-");
 	     if (result === "white")
 		  return [1000,""];
 	     else if (result === "black")
@@ -104,6 +105,7 @@ var engine = {
 	     
 	     if (color === turn) {
 		  
+		  
 		  var possibleMoves = this.getPossibleMoves(pos, turn);
 		  var bestMove = false;
 		  
@@ -112,6 +114,8 @@ var engine = {
 		      var score = this.getEvaluation(chessBoard.generateNewPosition(possibleMoves[m][0],possibleMoves[m][1],"-",pos), depth-1,color,other);
 		      
 		      if (!bestMove || (turn === "white" && score[0] > bestMove[0]) || (turn === "black" && score[0] < bestMove[0]))
+			   bestMove = [score[0], possibleMoves[m]];
+		      else if (score[0] === bestMove[0] && Math.random() > 0.8)
 			   bestMove = [score[0], possibleMoves[m]];
 		      
 		  }
@@ -129,7 +133,7 @@ var engine = {
 		      score += this.getEvaluation(chessBoard.generateNewPosition(possibleMoves[m][0],possibleMoves[m][1],"-",pos), depth-1,color,other)[0];
 		      		      
 		  }
-
+		  
 		  return [score/possibleMoves.length,""];
 	     }
 	     
